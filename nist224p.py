@@ -46,11 +46,13 @@ def add(p1, p2):
     if p2 == (None, None):
         return p1
 
-    # FIXME: This does not hold if p1.x == p2.x (but they have different y positions)
     x1, y1 = p1
     x2, y2 = p2
     if x1 == x2 and y1 == y2:
         return double((x1, y1))
+    if x1 == x2:
+        # Adding a point to its inverse gets us the identity - the point at infinity
+        return (None, None)
     m = ((y2 - y1) * mod_inv((x2 - x1) % p, p)) % p
     x3 = (m**2 - x1 - x2) % p
     y3 = (m * (x1 - x3) - y1) % p
