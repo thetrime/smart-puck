@@ -1,8 +1,10 @@
 import asyncio
-from airtag import scan_devices
+from bluetooth import scan_devices
+import airtag
 
 async def main():
-    # To do: Hydrate keys, set up IO, check LED status source
+    # To do: set up IO, check LED status source
+    airtag.setup("keys")
 
     # Start scanning
     scan_task = asyncio.create_task(scan_devices())
