@@ -3,7 +3,7 @@ Scan for bluetooth devices
 """
 import aioble
 import time
-import airtag.handle_airtag
+from airtag import handle_airtag
 
 APPLE = 0x004c
 STATUS_PAIRED = 0x12

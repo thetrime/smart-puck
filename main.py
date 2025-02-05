@@ -1,5 +1,5 @@
 import asyncio
-from bluetooth import scan_devices
+from scanner import scan_devices
 import airtag
 
 async def main():

@@ -5,7 +5,7 @@ from binascii import unhexlify
 from time import time
 from collections import deque
 import nist224p
-from datetime import format_date, iso8601_to_timestamp, timestamp_to_iso8601
+from udatetime import format_date, iso8601_to_timestamp, timestamp_to_iso8601
 import x963
 import sys
 
@@ -81,6 +81,7 @@ def update_key(key, update_advertised):
         print(f"We now have prefixes for {key['name']} from {timestamp_to_iso8601(key['advertised_times'][0])}Z to {timestamp_to_iso8601(key['advertised_times'][-1])}Z")
 
     # If the trace key is now at least 4 hours old, we can stash it
+    # FIXME: This will wreck my flash chip. We should instead just stash the current state once a day or something
     if t_i > key['trace_time'] + 4 * 60 * 60:
         if update_advertised:
             stash_key("keys", key)
