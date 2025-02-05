@@ -1,3 +1,8 @@
+# Smart Puck
+> But what if we went _smaller_?
+
+Details to follow. For now, this is just some notes on setting it up.
+
 First, install the aioble package onto the pico using Thonny or with this:
 ```
 import network
