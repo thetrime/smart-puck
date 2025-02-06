@@ -26,5 +26,6 @@ def iso8601_to_timestamp(sync_time):
 
     return t_0
 
+# This is just because I'm lazy
 def format_date(timestamp):
     return timestamp_to_iso8601(timestamp)

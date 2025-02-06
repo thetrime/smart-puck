@@ -14,7 +14,7 @@ keys = []
 ENDIANNESS = "big"
 WINDOW_SIZE = 20
 
-async def handle_airtag(address, data, rssi):
+async def handle_airtag(address, data, rssi, then):
     timestamp = time()
     first_byte = address[0] & 0b00111111
     key_prefix = address[1:].hex()
@@ -32,7 +32,15 @@ async def handle_airtag(address, data, rssi):
         key_prefix = "0x0" + hex(first_byte)[2] + key_prefix
     else:
         key_prefix = hex(first_byte) + key_prefix
-    # To do: Look up key in array to see if it is for a device we know
+
+    # Ok, look to see if this corresponds to one of our devices
+    for index, key in enumerate(keys):
+        for candidate in list(key['advertised_prefixes']):
+            if candidate.startswith(key_prefix):
+                print(f"Tag {key['name']} detected with prefix {key_prefix}")
+                then(key['name'], index, rssi)
+                return
+
     print(f"Unknown Apple device with prefix {key_prefix} detected at strength {rssi} dBm at {format_date(timestamp)}Z")
 
 def update_key(key, update_advertised):
