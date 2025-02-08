@@ -21,7 +21,6 @@ FIXME: Details to be filled in once I work out what the hardware is ^^
 You also need:
    * python
    * pip
-   * mpremote (which you can install via `pip install mpremote`)
 
 # Installation
 
