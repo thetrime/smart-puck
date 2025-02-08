@@ -38,7 +38,7 @@ def handle_airtag(address, data, rssi, then):
     for index, key in enumerate(keys):
         for candidate in list(key['advertised_prefixes']):
             if candidate.startswith(key_prefix):
-                print(f"Tag {key['name']} detected with prefix {key_prefix}")
+                print(f"Tag {key['name']} detected with prefix {key_prefix} at distance {rssi}")
                 then(key['name'], index, rssi)
                 return
 
