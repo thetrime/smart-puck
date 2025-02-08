@@ -8,13 +8,14 @@ import nist224p
 from udatetime import format_date, iso8601_to_timestamp, timestamp_to_iso8601
 import x963
 import sys
+import asyncio
 
 keys = []
 
 ENDIANNESS = "big"
 WINDOW_SIZE = 20
 
-async def handle_airtag(address, data, rssi, then):
+def handle_airtag(address, data, rssi, then):
     timestamp = time()
     first_byte = address[0] & 0b00111111
     key_prefix = address[1:].hex()
@@ -157,10 +158,9 @@ def rehydrate_keys():
             if i == 96:
                 # Provide a periodic update in case this is going to take a long time
                 i = 0
-                print(f"{p:.2f}% {key['name']}\r", end='')
-                sys.stdout.flush()
+                print(f"{p:.2f}% {key['name']}")
                 print(f"Key {key['name']} is at {timestamp_to_iso8601(key['time'])}Z")
-            update_key(key, True)
+            update_key(key, False)
         print(f"{100}% {key['name']}")
 
 
@@ -170,6 +170,8 @@ def stash_keys(filename):
     """
     # Save keys so we dont have to do this next time
     print("All keys updated. Saving...")
+    print("SKIPPING STASH")
+    return
     out = open(filename, "w", encoding="utf-8")
     for key in keys:
         out.write(
@@ -201,6 +203,8 @@ def stash_key(filename, target):
             existing.append(target)
         else:
             existing.append(key)
+    print("SKIPPING STASH")
+    return
     out = open(filename, "w", encoding="utf-8")
     for key in existing:
         out.write(
@@ -215,8 +219,22 @@ def stash_key(filename, target):
         )
     out.close()
 
+async def roll_keys():
+    """
+    Update keys until there are WINDOW_SIZE advertised keys available, with the current time
+    being the middle of the array
+    """
+    while True:
+        print("Keyroller active")
+        for key in keys:
+            while key['time'] < time() + (WINDOW_SIZE/2) * 15 * 60:
+                print(f"Key {key['name']} needs updating because it has time {format_date(key['time'])}Z but the end window is {format_date(int(time() + (WINDOW_SIZE/2) * 15 * 60))}Z\n")
+                update_key(key, True)
+        print("Key schedule is current")
+        await asyncio.sleep(60)
 
-def setup(filename):
+
+def airtag_setup(filename):
     """
     Prepare the key data in filename
     """
