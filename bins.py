@@ -59,7 +59,7 @@ def update_bins(then):
         collection_year = int(match.group(4))
 
         collection_date = utime.mktime((collection_year, collection_month, collection_day, 0, 0, 0, 0, 0))
-        (year, month, day, _, _, _, _, _, _) = utime.localtime()
+        (year, month, day, _, _, _, _, _) = utime.localtime()
         tomorrow = utime.mktime((year, month, day + 1, 0, 0, 0, 0, 0))
 
         # This sets the value of result[colour] to be:
@@ -67,10 +67,12 @@ def update_bins(then):
         #    * True if it was already set to true (regardless of the value here
         #    * False if it was previously unset or False, and the collection_date is not tomorrow
         result[collection['colour']] = result.get(collection['colour']) or (collection_date == tomorrow)
+
+    print(f"Bins updated: {result}")
     then(result)
 
 async def bin_updater(then):
     update_bins(then)
     while True:
-        asyncio.sleep(14400) # 4 hours
+        await asyncio.sleep(14400) # 4 hours
         update_bins(then)
