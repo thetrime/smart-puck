@@ -26,3 +26,13 @@ You also need:
 A shell script is available for bash users. `mpremote cp *.py :` doesn't work on Windows. A workaround is to stop using Windows.
 
 That's it. Reboot and it's ready!
+
+# To do list
+## Code
+   * We never stash the keys. Change the logic to stash them once a day, instead of every time we roll them
+   * The window is probably way too big. Reducing it will massively speed up the startup
+   * The deque has a fixed length. We don't need to manage it explicitly like we did in the full version
+
+## Hardware
+Finish the schematic and PCB design
+Create a STL for the case
