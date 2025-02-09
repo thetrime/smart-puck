@@ -23,28 +23,6 @@ You also need:
    * pip
 
 # Installation
-
-First copy in the code and the config. According to sources online, wildcards can be passed. In practise, mpremote seems to think they can't
-
-```shell
-pip install mpremote
-mpremote cp main.py :
-mpremote cp airtag.py :
-mpremote cp bins.py :
-mpremote cp illuminated_switch.py :
-mpremote cp fast_nist224p.py :
-mpremote cp scanner.py : 
-mpremote cp udatetime.py :
-mpremote cp x963.py :
-mpremote cp install.py :
-mpremote cp keys :
-mpremote cp uprn :
-mpremote cp wifi :
-```
-
-Now install the packages we need:
-```shell
-mpremote run install.py
-```
+A shell script is available for bash users. `mpremote cp *.py :` doesn't work on Windows. A workaround is to stop using Windows.
 
 That's it. Reboot and it's ready!
