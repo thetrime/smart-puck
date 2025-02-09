@@ -26,5 +26,5 @@ That's it. Reboot and it's ready!
    * The deque has a fixed length. We don't need to manage it explicitly like we did in the full version
 
 ## Hardware
-Finish the schematic and PCB design
-Create a STL for the case
+   * Finish the schematic and PCB design
+   * Create a STL for the case
