@@ -1,9 +1,9 @@
 #!/bin/bash
 
 pip install mpremote
-mpremote cp *.py :
-mpremote cp keys :
-mpremote cp uprn :
-mpremote cp wifi :
+mpremote cp src/*.py :
+mpremote cp config/keys :
+mpremote cp config/uprn :
+mpremote cp config/wifi :
 
-mpremote run install.py
+mpremote run src/install.py
