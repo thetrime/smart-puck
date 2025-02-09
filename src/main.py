@@ -20,8 +20,6 @@ binLEDs = {
     "Black": LED(4)
 }
 
-status = LED(9)
-
 doorbell = Buzzer(9)
 
 def ring_doorbell():
@@ -42,7 +40,7 @@ async def airtag_found(_name, index, rssi):
 
 
 async def main():
-    status.blink(1)
+    binLEDs[0].blink(1)
     with open('wifi', 'r') as file:
         ssid = file.readline().strip()
         password = file.readline().strip()
@@ -54,14 +52,20 @@ async def main():
         print('Waiting for wifi connection...')
         sleep(1)
     print("Connected!")
-    status.blink(2)
+    binLEDs[0].on()
+    binLEDs[1].blink()
 
     # Now we have internet, set the time
     ntptime.settime()
 
     # To do: set up IO, check LED status source
     airtag_setup("keys")
-    status.on()
+    binLEDs[1].on()
+
+    await asyncio.sleep(1)
+
+    for led in binLEDs:
+        led.off()
 
     # Start scanning
     asyncio.create_task(scan_devices(airtag_found))
