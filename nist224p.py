@@ -2,6 +2,8 @@
 Functions for manipulating points on the NIST224p curve
 """
 
+import time
+
 # These are the parameters for the NIST224p curve (from the curve database at https://neuromancer.sk/std/nist/P-224)
 a = 0xfffffffffffffffffffffffffffffffefffffffffffffffffffffffe
 b = 0xb4050a850c04b3abf54132565044b0b7d7bfd8ba270b39432355ffb4
@@ -72,3 +74,16 @@ def multiply(u, point):
 
 def generator(u):
     return multiply(u, G)
+
+
+def performance_test():
+    start = time.ticks_us()
+    u = reduce(123456789012345678901234567890)
+    v = reduce(987654321098765432109876543210)
+    P = (0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296 % p, 0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162cb3398a3d3e1b16783b2ad3cf2f3b52 % p)
+    result = add(multiply(u, P), multiply(v, G))
+    end = time.ticks_us()
+
+    print(f"Result: {result} time = {end-start}us")
+
+performance_test()
