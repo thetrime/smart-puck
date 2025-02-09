@@ -8,6 +8,9 @@ OFF = 0
 PRIMING = 1
 ARMED = 2
 
+def foo():
+    print("foo")
+
 class IlluminatedSwitch:
     def __init__(self, led, switch, trigger):
         self.led = led
@@ -16,7 +19,7 @@ class IlluminatedSwitch:
         self.timer = Timer(-1)
         self.trigger = trigger
         self.led.value = 0
-        self.switch.when_pressed(self.__handle_press)
+        self.switch.when_pressed = self.__handle_press
 
     def __prime(self):
         # Stop any previous timers, to avoid leaking one
