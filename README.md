@@ -13,7 +13,9 @@ You also need:
    * pip
 
 # Installation
-A shell script is available for bash users. `mpremote cp *.py :` doesn't work on Windows. A workaround is to stop using Windows.
+A shell script is available for bash users. (`mpremote cp *.py :` doesn't work on Windows). A workaround is to stop using Windows.
+
+You can install it by just running `./install.sh` after plugging in your pico. Note that you also have to flash the Micropython firmware to it first.
 
 That's it. Reboot and it's ready!
 
