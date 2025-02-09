@@ -63,10 +63,11 @@ def multiply(u, point):
     x, y = point
     result_x, result_y = (None, None) # Infinity
     # Loop from least to most significant bit
-    for i in ''.join(reversed(bin(u)[2:])):
-        if i == '1':
+    while u:
+        if u & 1:
             result_x, result_y = add((result_x, result_y), (x, y))
         x, y = double((x, y))
+        u >>= 1
     return (result_x, result_y)
 
 def generator(u):
