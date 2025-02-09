@@ -21,10 +21,7 @@ That's it. Reboot and it's ready!
 
 # To do list
 ## Code
-   * We never stash the keys. Change the logic to stash them once a day, instead of every time we roll them
-   * The window is probably way too big. Reducing it will massively speed up the startup
-   * The deque has a fixed length. We don't need to manage it explicitly like we did in the full version
-
+   * Nothing? That doesn't sound right
 ## Hardware
    * Finish the schematic and PCB design
    * Create a STL for the case

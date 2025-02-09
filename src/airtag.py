@@ -7,13 +7,16 @@ from collections import deque
 import nist224p
 from udatetime import format_date, iso8601_to_timestamp, timestamp_to_iso8601
 import x963
-import sys
 import asyncio
 
 keys = []
-
+debugging = True
 ENDIANNESS = "big"
-WINDOW_SIZE = 20
+WINDOW_SIZE = 8
+
+def debug(string):
+    if (debugging):
+        print(string)
 
 def handle_airtag(address, data, rssi, then):
     timestamp = time()
@@ -49,7 +52,7 @@ def update_key(key, update_advertised):
     Update a given key to the next key period
     """
     t_i = key['time'] + 15*60
-    
+
     # Derive SK_1 from SK_0
     sk_1 = x963.kdf(key['shared_key'], 32, "update")
     
@@ -70,10 +73,7 @@ def update_key(key, update_advertised):
         # Compute P_1
         p_1 = nist224p.compute_result(u_1, key['p_0'], v_1)
 
-        if len(key['advertised_prefixes']) > WINDOW_SIZE:
-            old_prefix = key['advertised_prefixes'].popleft()
-            old_time = key['advertised_times'].popleft()
-            print(f"At {timestamp_to_iso8601(time())}Z we are dropping old key for {key['name']} that was valid at {timestamp_to_iso8601(old_time)}Z: ${old_prefix}")
+        debug(f"At {timestamp_to_iso8601(time())}Z we are dropping old key for {key['name']} that was valid at {timestamp_to_iso8601(key['advertised_times'][0])}Z: ${key['advertised_prefixes'][0]}")
         # We only really care about the first 6 bytes of the key.
         # In the near-to-owner case, this is all that is advertised..
         # The full key is only needed if we want to upload a finding-report to Apple
@@ -83,13 +83,7 @@ def update_key(key, update_advertised):
         key['advertised_times'].append(t_i)
         print(f"We now have prefixes for {key['name']} from {timestamp_to_iso8601(key['advertised_times'][0])}Z to {timestamp_to_iso8601(key['advertised_times'][-1])}Z")
 
-    # If the trace key is now at least 4 hours old, we can stash it
-    # FIXME: This will wreck my flash chip. We should instead just stash the current state once a day or something
-    if t_i > key['trace_time'] + 4 * 60 * 60:
-        if update_advertised:
-            stash_key("keys", key)
-        key['trace'] = sk_1
-        key['trace_time'] = t_i
+    # Regardless of the prefix stuff, we need to update these values
     key['time'] = t_i
     key['shared_key'] = sk_1
 
@@ -163,9 +157,7 @@ def stash_keys(filename):
     Save current key state
     """
     # Save keys so we dont have to do this next time
-    print("All keys updated. Saving...")
-    print("SKIPPING STASH")
-    return
+    print("Stashing keys")
     out = open(filename, "w", encoding="utf-8")
     for key in keys:
         out.write(
@@ -181,37 +173,6 @@ def stash_keys(filename):
     out.close()
 
 
-def stash_key(filename, target):
-    """
-    Save specific key but leave others alone
-    """
-    print(f"Saving key for {target['name']}")
-    existing = []
-    existing_data = open(filename, "r", encoding="utf-8")
-    key_lines = existing_data.read().splitlines()
-    for line in key_lines:
-        if line.startswith("#"):
-            continue
-        key = parse_key_line(line)
-        if key['name'] == target['name']:
-            existing.append(target)
-        else:
-            existing.append(key)
-    print("SKIPPING STASH")
-    return
-    out = open(filename, "w", encoding="utf-8")
-    for key in existing:
-        out.write(
-            timestamp_to_iso8601(key['trace_time']) +
-            "Z " +
-            key['trace'].hex() +
-            " " +
-            key['public_key'] +
-            " " +
-            key['name'] +
-            "\n"
-        )
-    out.close()
 
 def update_keys():
     for key in keys:
@@ -226,9 +187,15 @@ async def keyroller():
     Update keys until there are WINDOW_SIZE advertised keys available, with the current time
     being the middle of the array
     """
+    last_stash = time()
     while True:
         update_keys()
         await asyncio.sleep(60)
+        # If more than 24 hours has passed since we last stashed the keys then stash them again
+        # This is safe in general because only this thread ever updates the key structure (once the boot is finished)
+        if time() - last_stash > 86400:
+            stash_keys("keys")
+            last_stash = time()
 
 
 def airtag_setup(filename):
@@ -238,10 +205,11 @@ def airtag_setup(filename):
     print("Loading keys")
     load_keys(filename)
     print(f"Loaded {len(keys)} keys. Rehydrating...")
-    # We stash the keys after rehydrating. To avoid getting too far ahead, we keep WINDOW_SIZE/2 blocks behind
-    rehydrate_keys()
-    print("Keys rehydrated. Stashing hydrated keys")
-    stash_keys(filename)
+    key_age = rehydrate_keys()
+    print("Keys rehydrated")
+    if key_age > 86400:
+        print("Keys are older than 24 hours. Stashing rehydrated keys")
+        stash_keys(filename)
     # Now bring them up to date
     update_keys()
 
