@@ -70,7 +70,7 @@ async def main():
     asyncio.create_task(bin_updater(bins_updated))
 
     # Start keyroller
-    asyncio.create_task(keyyroller())
+    asyncio.create_task(keyroller())
 
     # Wait forever
     await asyncio.Event().wait()
