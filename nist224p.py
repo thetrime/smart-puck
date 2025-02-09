@@ -167,4 +167,4 @@ def performance_test():
 
     print(f"Result: {result} time = {end-start}us")
 
-performance_test()
+#performance_test()
