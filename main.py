@@ -10,7 +10,7 @@ from scanner import scan_devices
 from bins import bin_updater
 from illuminated_switch import IlluminatedSwitch
 from picozero import LED, Button, Buzzer
-from airtag import airtag_setup, roll_keys
+from airtag import airtag_setup, keyroller
 
 
 binLEDs = {
@@ -19,6 +19,8 @@ binLEDs = {
     "Brown": LED(3),
     "Black": LED(4)
 }
+
+status = LED(9)
 
 doorbell = Buzzer(9)
 
@@ -40,6 +42,7 @@ async def airtag_found(_name, index, rssi):
 
 
 async def main():
+    status.blink(1)
     with open('wifi', 'r') as file:
         ssid = file.readline().strip()
         password = file.readline().strip()
@@ -51,12 +54,14 @@ async def main():
         print('Waiting for wifi connection...')
         sleep(1)
     print("Connected!")
+    status.blink(2)
 
     # Now we have internet, set the time
     ntptime.settime()
 
     # To do: set up IO, check LED status source
     airtag_setup("keys")
+    status.on()
 
     # Start scanning
     asyncio.create_task(scan_devices(airtag_found))
@@ -65,7 +70,7 @@ async def main():
     asyncio.create_task(bin_updater(bins_updated))
 
     # Start keyroller
-    asyncio.create_task(roll_keys())
+    asyncio.create_task(keyyroller())
 
     # Wait forever
     await asyncio.Event().wait()

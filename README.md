@@ -32,7 +32,7 @@ mpremote cp main.py :
 mpremote cp airtag.py :
 mpremote cp bins.py :
 mpremote cp illuminated_switch.py :
-mpremote cp nist224p.py :
+mpremote cp fast_nist224p.py :
 mpremote cp scanner.py : 
 mpremote cp udatetime.py :
 mpremote cp x963.py :

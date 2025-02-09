@@ -53,12 +53,6 @@ def update_key(key, update_advertised):
     # Derive SK_1 from SK_0
     sk_1 = x963.kdf(key['shared_key'], 32, "update")
     
-    #xkdf = X963KDF(
-    #    algorithm=hashes.SHA256(),
-    #    length=32,
-    #    sharedinfo=b"update",
-    #)
-    #sk_1 = xkdf.derive(key['shared_key'])
     print(f"Updating key {key['name']} to be current from {timestamp_to_iso8601(t_i)}Z")
     if update_advertised:
         
@@ -74,7 +68,7 @@ def update_key(key, update_advertised):
         v_1 = nist224p.reduce(v_1)
 
         # Compute P_1
-        p_1 = nist224p.add(nist224p.multiply(u_1, key['p_0']), nist224p.generator(v_1))
+        p_1 = nist224p.compute_result(u_1, key['p_0'], v_1)
 
         if len(key['advertised_prefixes']) > WINDOW_SIZE:
             old_prefix = key['advertised_prefixes'].popleft()
@@ -219,18 +213,21 @@ def stash_key(filename, target):
         )
     out.close()
 
-async def roll_keys():
+def update_keys():
+    for key in keys:
+        while key['time'] < time() + (WINDOW_SIZE/2) * 15 * 60:
+            print(f"Key {key['name']} needs updating because it has time {format_date(key['time'])}Z but the end window is {format_date(int(time() + (WINDOW_SIZE/2) * 15 * 60))}Z\n")
+            update_key(key, True)
+    print("Key schedule is current")
+
+
+async def keyroller():
     """
     Update keys until there are WINDOW_SIZE advertised keys available, with the current time
     being the middle of the array
     """
     while True:
-        print("Keyroller active")
-        for key in keys:
-            while key['time'] < time() + (WINDOW_SIZE/2) * 15 * 60:
-                print(f"Key {key['name']} needs updating because it has time {format_date(key['time'])}Z but the end window is {format_date(int(time() + (WINDOW_SIZE/2) * 15 * 60))}Z\n")
-                update_key(key, True)
-        print("Key schedule is current")
+        update_keys()
         await asyncio.sleep(60)
 
 
@@ -245,7 +242,8 @@ def airtag_setup(filename):
     rehydrate_keys()
     print("Keys rehydrated. Stashing hydrated keys")
     stash_keys(filename)
-    return [key['name'] for key in keys]
+    # Now bring them up to date
+    update_keys()
 
 
 if __name__ == "__main__":
