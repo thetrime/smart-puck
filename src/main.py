@@ -40,7 +40,7 @@ async def airtag_found(_name, index, rssi):
 
 
 async def main():
-    binLEDs[0].blink(1)
+    binLEDs['Blue'].blink(1)
     with open('wifi', 'r') as file:
         ssid = file.readline().strip()
         password = file.readline().strip()
@@ -52,20 +52,20 @@ async def main():
         print('Waiting for wifi connection...')
         sleep(1)
     print("Connected!")
-    binLEDs[0].on()
-    binLEDs[1].blink()
+    binLEDs['Blue'].on()
+    binLEDs['Green'].blink()
 
     # Now we have internet, set the time
     ntptime.settime()
 
     # To do: set up IO, check LED status source
     airtag_setup("keys")
-    binLEDs[1].on()
+    binLEDs['Green'].on()
 
     await asyncio.sleep(1)
 
     for led in binLEDs:
-        led.off()
+        binLEDs[led].off()
 
     # Start scanning
     asyncio.create_task(scan_devices(airtag_found))

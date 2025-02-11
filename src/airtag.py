@@ -73,7 +73,9 @@ def update_key(key, update_advertised):
         # Compute P_1
         p_1 = nist224p.compute_result(u_1, key['p_0'], v_1)
 
-        debug(f"At {timestamp_to_iso8601(time())}Z we are dropping old key for {key['name']} that was valid at {timestamp_to_iso8601(key['advertised_times'][0])}Z: ${key['advertised_prefixes'][0]}")
+        # The deque is initially empty
+        if len(key['advertised_times']) == WINDOW_SIZE:
+            debug(f"At {timestamp_to_iso8601(time())}Z we are dropping old key for {key['name']} that was valid at {timestamp_to_iso8601(key['advertised_times'][0])}Z: ${key['advertised_prefixes'][0]}")
         # We only really care about the first 6 bytes of the key.
         # In the near-to-owner case, this is all that is advertised..
         # The full key is only needed if we want to upload a finding-report to Apple
@@ -135,9 +137,12 @@ def rehydrate_keys():
     Refresh all keys until they are at most 4 hours old
     """
     # Get all the keys up to date as of 4 hours ago
+    oldest = time()
     for key in keys:
         i = 0
         original_time = key['time']
+        if original_time < oldest:
+            oldest = original_time
         print(f"Rehydrating key {key['name']} which was last stashed with timestamp {timestamp_to_iso8601(key['time'])}Z\n")
         while key['time'] < time() - 4 * 60 * 60:
             p = 100 * ((key['time'] - original_time) /
@@ -150,6 +155,7 @@ def rehydrate_keys():
                 print(f"Key {key['name']} is at {timestamp_to_iso8601(key['time'])}Z")
             update_key(key, False)
         print(f"{100}% {key['name']}")
+    return time() - oldest
 
 
 def stash_keys(filename):
@@ -206,7 +212,7 @@ def airtag_setup(filename):
     load_keys(filename)
     print(f"Loaded {len(keys)} keys. Rehydrating...")
     key_age = rehydrate_keys()
-    print("Keys rehydrated")
+    print(f"Keys rehydrated. They had been frozen for {key_age} seconds")
     if key_age > 86400:
         print("Keys are older than 24 hours. Stashing rehydrated keys")
         stash_keys(filename)
