@@ -8,8 +8,6 @@ OFF = 0
 PRIMING = 1
 ARMED = 2
 
-def foo():
-    print("foo")
 
 class IlluminatedSwitch:
     def __init__(self, led, switch, trigger):
@@ -40,7 +38,7 @@ class IlluminatedSwitch:
             self.state = OFF
             self.led.off()
 
-    def __arm(self):
+    def __arm(self, t):
         self.state = ARMED
         self.timer.deinit()
         self.led.on()
