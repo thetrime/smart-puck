@@ -20,7 +20,7 @@ binLEDs = {
     "Black": LED(21)
 }
 
-doorbell = Buzzer(9)
+doorbell = Buzzer(22)
 
 def ring_doorbell():
     doorbell.on(1, 1, False)
