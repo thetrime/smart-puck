@@ -14,10 +14,10 @@ from airtag import airtag_setup, keyroller
 
 
 binLEDs = {
-    "Blue": LED(1),
-    "Green": LED(2),
-    "Brown": LED(3),
-    "Black": LED(4)
+    "Blue": LED(18),
+    "Green": LED(19),
+    "Brown": LED(20),
+    "Black": LED(21)
 }
 
 doorbell = Buzzer(9)
@@ -27,8 +27,8 @@ def ring_doorbell():
 
 # The order of these has to match the order of the keys in the keys file
 airtags = {
-    IlluminatedSwitch(LED(5), Button(7), ring_doorbell),
-    IlluminatedSwitch(LED(6), Button(8), ring_doorbell)
+    IlluminatedSwitch(LED(1), Button(2), ring_doorbell),
+    IlluminatedSwitch(LED(8), Button(9), ring_doorbell)
 }
 
 async def bins_updated(to):
@@ -62,7 +62,6 @@ async def main():
     airtag_setup("keys")
     binLEDs['Green'].on()
 
-    await asyncio.sleep(1)
 
     for led in binLEDs:
         binLEDs[led].off()
