@@ -24,23 +24,22 @@ binLEDs = {
 doorbell = Buzzer(22)
 
 def ring_doorbell():
+    print("Ding dong")
     doorbell.on(1, 1, False)
 
 # The order of these has to match the order of the keys in the keys file
-airtags = {
+airtags = [
     IlluminatedSwitch(LED(1), Button(2), ring_doorbell),
     IlluminatedSwitch(LED(8), Button(9), ring_doorbell)
-}
+]
 
 async def bins_updated(to):
     for colour, state in to:
         binLEDs[colour].value = state
 
-async def airtag_found(_name, index, rssi):
-    if rssi < NEARBY:
-        airtags[index].found(rssi)
-    else:
-        print(f"Found but too far away")
+def airtag_found(_name, index, rssi):
+    if rssi > NEARBY:
+        airtags[index].found()
 
 
 async def main():

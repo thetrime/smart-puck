@@ -24,3 +24,4 @@ async def scan_devices(then):
     async with aioble.scan(duration_ms=0, interval_us=11250, window_us=11250) as scanner:  # 0 means scan indefinitely
         async for result in scanner:
             handle_device(result, then)
+    
