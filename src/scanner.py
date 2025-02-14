@@ -21,7 +21,6 @@ def handle_device(result, then):
 
 async def scan_devices(then):
     print("Starting continuous BLE scan...")
-    # , interval_us=30000, window_us=30000
-    async with aioble.scan(duration_ms=0) as scanner:  # 0 means scan indefinitely
+    async with aioble.scan(duration_ms=0, interval_us=11250, window_us=11250) as scanner:  # 0 means scan indefinitely
         async for result in scanner:
             handle_device(result, then)

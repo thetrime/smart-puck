@@ -12,6 +12,7 @@ from illuminated_switch import IlluminatedSwitch
 from picozero import LED, Button, Buzzer
 from airtag import airtag_setup, keyroller
 
+NEARBY = -80
 
 binLEDs = {
     "Blue": LED(18),
@@ -36,7 +37,10 @@ async def bins_updated(to):
         binLEDs[colour].value = state
 
 async def airtag_found(_name, index, rssi):
-    airtags[index].found(rssi)
+    if rssi < NEARBY:
+        airtags[index].found(rssi)
+    else:
+        print(f"Found but too far away")
 
 
 async def main():
