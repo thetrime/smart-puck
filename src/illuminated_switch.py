@@ -3,6 +3,7 @@ A class representing an illuminated switch to control an Airtag
 """
 
 from machine import Timer
+import time
 
 OFF = 0
 PRIMING = 1
@@ -27,7 +28,8 @@ class IlluminatedSwitch:
     def __handle_press(self):
         if self.state == OFF:
             self.state = PRIMING
-            self.led.blink()
+            time.sleep_ms(1000 - (time.ticks_ms() % 1000))
+            self.led.blink(0.5)
             self.__prime()
         elif self.state == PRIMING:
             self.timer.deinit()

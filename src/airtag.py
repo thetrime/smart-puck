@@ -45,7 +45,7 @@ def handle_airtag(address, data, rssi, then):
                 then(key['name'], index, rssi)
                 return
 
-    print(f"Unknown Apple device with prefix {key_prefix} detected at strength {rssi} dBm at {format_date(timestamp)}Z")
+    # print(f"Unknown Apple device with prefix {key_prefix} detected at strength {rssi} dBm at {format_date(timestamp)}Z")
 
 def update_key(key, update_advertised):
     """
